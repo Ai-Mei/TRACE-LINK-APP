@@ -8,7 +8,7 @@ root.title("TrackrBee")
 root.geometry("500x500")
 
 # Change the icon of the window.
-icon_path = r"C:\Users\Administrator\Documents\2ND SEMESTER\OOP\FINAL PROJECT\TRACE-LINK-APP\icon.gif"
+icon_path = r"C:\Users\Administrator\Documents\2ND SEMESTER\OOP\FINAL PROJECT\TraceBee\icon.gif"
 icon = tk.PhotoImage(file=icon_path)
 root.iconphoto(True, icon)
 
