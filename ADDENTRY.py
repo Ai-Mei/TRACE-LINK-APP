@@ -17,6 +17,9 @@ class AddEntry:
 
 
         ui = UINewPage()
+        # Add the initial data needed for contact tracing.
+        ui.create_form(new_page)
+        # Add a back button
         ui.back_button(new_page, self.top)
 
 
