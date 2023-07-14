@@ -2,7 +2,6 @@ import tkinter as tk
 from UINEWPAGE import UINewPage
 ui = UINewPage()
 
-
 class AddEntry:
     def __init__(self, top):
         self.top = top

@@ -20,10 +20,8 @@ canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("
 frame = tk.Frame(canvas)
 canvas.create_window((0, 0), window=frame, anchor=tk.NW)
 
-
 ui = UserInterface(top)
 ui.buttons(frame)
-
 
 
 top.mainloop()
