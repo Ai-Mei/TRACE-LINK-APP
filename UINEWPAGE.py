@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import font
 import tkinter.messagebox as messagebox
 
 class UINewPage:
@@ -6,10 +7,16 @@ class UINewPage:
         back_button = tk.Button(new_page, text="Back to Homepage", command=lambda: self.close_next_page(new_page, top))
         back_button.pack()
 
-    def close_next_page(self, page, top):
+    def close_next_page(self, new_page, top):
         # Close the next page window
-        page.destroy()
-        # Show the previous window (top)
+        new_page.destroy()
+
+        # Destroy any other Toplevel windows except the main page
+        for window in top.winfo_children():
+            if isinstance(window, tk.Toplevel):
+                window.destroy()
+
+        # Show the main page (top)
         top.deiconify()
 
     def create_search(self, new_page):
@@ -71,53 +78,113 @@ class UINewPage:
 
 
     def create_form(self, new_page):
+        bold_font = font.Font(weight="bold")
         # Create labels and entry fields for each information field
-        label_full_name = tk.Label(new_page, text="Full Name:")
+        head1 = tk.Label(new_page, text="PERSONAL INFORMATION", font=bold_font)
+        head1.pack(pady=10)
+
+        label_full_name = tk.Label(new_page, text="Full Name:", font=bold_font)
         label_full_name.pack(anchor='w', padx=50)
         self.entry_full_name = tk.Entry(new_page)
         self.entry_full_name.pack(anchor='w', padx=50)
-        self.entry_full_name.config(width=50)
+        self.entry_full_name.config(width=60)
 
-        label_phone_number = tk.Label(new_page, text="Phone Number:")
+        label_phone_number = tk.Label(new_page, text="Phone Number:", font=bold_font)
         label_phone_number.pack(anchor='w', padx=50)
         self.entry_phone_number = tk.Entry(new_page)
         self.entry_phone_number.pack(anchor='w', padx=50)
-        self.entry_phone_number.config(width=50)
+        self.entry_phone_number.config(width=60)
 
-        label_address = tk.Label(new_page, text="Address:")
+        label_address = tk.Label(new_page, text="Address:", font=bold_font)
         label_address.pack(anchor='w', padx=50)
         self.entry_address = tk.Entry(new_page)
         self.entry_address.pack(anchor='w', padx=50)
-        self.entry_address.config(width=50)
+        self.entry_address.config(width=60)
 
-        label_age = tk.Label(new_page, text="Age:")
+        label_age = tk.Label(new_page, text="Age:", font=bold_font)
         label_age.pack(anchor='w', padx=50)
         self.entry_age = tk.Entry(new_page)
         self.entry_age.pack(anchor='w', padx=50)
-        self.entry_age.config(width=50)
+        self.entry_age.config(width=60)
 
-        # Create a checkbox for users to select sex
-        label_sex = tk.Label(new_page, text="Sex:")
+        label_sex = tk.Label(new_page, text="Sex:", font=bold_font)
         label_sex.pack(padx=50, anchor='w')
-        
         sex_choices = ["Female", "Male", "Intersex"]
         self.selected_sex = tk.StringVar()
         for sex in sex_choices:
             checkbox = tk.Checkbutton(new_page, text=sex, variable=self.selected_sex, onvalue=sex, offvalue="")
             checkbox.pack(anchor='w', padx=50)
 
-        label_email = tk.Label(new_page, text="Email Address:")
+        label_email = tk.Label(new_page, text="Email Address:", font=bold_font)
         label_email.pack(anchor='w', padx=50)
         self.entry_email = tk.Entry(new_page)
         self.entry_email.pack(anchor='w', padx=50)
-        self.entry_email.config(width=50)
+        self.entry_email.config(width=60)
 
-        label_occupation = tk.Label(new_page, text="Occupation:")
+        label_occupation = tk.Label(new_page, text="Occupation:", font=bold_font)
         label_occupation.pack(anchor='w', padx=50)
         self.entry_occupation = tk.Entry(new_page)
         self.entry_occupation.pack(anchor='w', padx=50)
-        self.entry_occupation.config(width=50)
+        self.entry_occupation.config(width=60)
 
+
+        head2 = tk.Label(new_page, text="HEALTH INFORMATION", font=bold_font)
+        head2.pack(pady=10)
+
+        label_vax = tk.Label(new_page, text="Have you been vaccinated for COVID-19?", font=bold_font)
+        label_vax.pack(padx=50, anchor='w')
+        vax_choices = ["Not Yet", "1st Dose", "2nd Dose (Fully Vaccinated)", "1st Booster Shot", "2nd Booster Shot"]
+        self.selected_vax = tk.StringVar()
+        for vax in vax_choices:
+            checkbox = tk.Checkbutton(new_page, text=vax, variable=self.selected_vax, onvalue=vax, offvalue="")
+            checkbox.pack(anchor='w', padx=50)
+
+        label_symptoms = tk.Label(new_page, text="Symptoms (select all that apply):", font=bold_font)
+        label_symptoms.pack(padx=50, anchor='w')
+        symptom_choices = [
+            "Fever",
+            "Cough",
+            "Colds",
+            "Muscle/body pains",
+            "Sore throat",
+            "Diarrhea",
+            "Headache",
+            "Shortness of breath",
+            "Difficulty of breathing",
+            "Loss of taste",
+            "Loss of smell"
+        ]
+        self.selected_symptoms = []
+        for symptom_choice in symptom_choices:
+            var = tk.IntVar()
+            checkbox = tk.Checkbutton(new_page, text=symptom_choice, variable=var)
+            checkbox.pack(anchor='w', padx=50)
+            self.selected_symptoms.append((symptom_choice, var))
+
+        label_exposure = tk.Label(new_page, text="In the last 14 days, were you exposed to a possible\nor confirmed case?", font=bold_font)
+        label_exposure.pack(anchor='w', padx=50)
+        exposure_choices = ["Yes", "No", "Not Sure"]
+        self.selected_exposure = tk.StringVar()
+        for exposure in exposure_choices:
+            checkbox = tk.Checkbutton(new_page, text=exposure, variable=self.selected_exposure, onvalue=exposure, offvalue="")
+            checkbox.pack(anchor='w', padx=50)
+
+        label_exposure1 = tk.Label(new_page, text="In the previous week, did you come into touch with\n anyone who was experiencing body aches, colds,\nheadaches, sore throats, fevers, diarrhea, coughs,\nshortness of breath, loss of taste, or loss of smell? ", font=bold_font)
+        label_exposure1.pack(anchor='w', padx=50)
+        exposure1_choices = ["Yes", "No"]
+        self.selected_exposure1 = tk.StringVar()
+        for exposure1 in exposure1_choices:
+            checkbox = tk.Checkbutton(new_page, text=exposure1, variable=self.selected_exposure1, onvalue=exposure1, offvalue="")
+            checkbox.pack(anchor='w', padx=50)
+
+        label_test = tk.Label(new_page, text="Have you had a Covid-19 test within the previous\n14 days? ", font=bold_font)
+        label_test.pack(anchor='w', padx=50)
+        test_choices = ["No", "Yes-Positive", "Yes-Negative", "Yes-Pending"]
+        self.selected_test = tk.StringVar()
+        for test in test_choices:
+            checkbox = tk.Checkbutton(new_page, text=test, variable=self.selected_test, onvalue=test, offvalue="")
+            checkbox.pack(anchor='w', padx=50)
+ 
         # Create the save button
         save_button = tk.Button(new_page, text="Save", command=lambda: self.save_data(new_page))
         save_button.pack(anchor='w', padx=50, pady=40)
