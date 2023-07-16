@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import font
+import datetime
 import tkinter.messagebox as messagebox
 
 class UINewPage:
@@ -10,28 +11,56 @@ class UINewPage:
     def close_next_page(self, new_page, top):
         # Close the next page window
         new_page.destroy()
-
         # Destroy any other Toplevel windows except the main page
         for window in top.winfo_children():
             if isinstance(window, tk.Toplevel):
                 window.destroy()
-
         # Show the main page (top)
         top.deiconify()
 
     def create_search(self, new_page):
+        bold_font = font.Font(weight="bold")
         self.search_entry = tk.Entry(new_page, width=50)
         self.search_entry.pack(pady=20)
-        
-        search_button = tk.Button(new_page, text="Search", command=self.searched_word, width=10, height=1)
+
+        search_button = tk.Button(new_page, text="Search", command=lambda: self.searched_word(new_page), width=10, height=1)
         search_button.pack()
 
-    # Get the search word
-    def searched_word(self):
-        searched = self.search_entry.get()
+        self.result_label = tk.Label(new_page, text="Results:", font=bold_font)
+        self.result_label.pack(anchor='w', padx=50)
 
-    def save_data(self, new_page):
-        # Get the input values from the user
+        self.text_widget = tk.Text(new_page, height=10, width=50)
+        self.text_widget.pack()
+
+    # Get the search word and display the matching entry
+    def searched_word(self, new_page):
+        searched = self.search_entry.get()
+        with open("BEE_INFORMATION.txt", "r") as file:
+            contents = file.read()
+            index = contents.find(searched)
+            if index != -1:
+                self.text_widget.delete("1.0", tk.END)
+                self.text_widget.insert(tk.END, contents)
+                self.text_widget.tag_add("bold", f"1.{index}", f"1.{index + len(searched)}")
+                bold_font = font.Font(self.text_widget, self.text_widget.cget("font"))
+                bold_font.configure(weight="bold")
+                self.text_widget.tag_configure("bold", font=bold_font)
+
+                self.result_label.config(text=f"Result: Word found - {searched}")
+            else:
+                self.text_widget.delete("1.0", tk.END)
+                self.result_label.config(text="Result: Word not found.")
+
+    # UPDATE THE SAVE DATA TO GET ALL OF THE INFORMATION IN THE HEALTH INFORMATION
+    def save_data(self):
+        # Get the date
+        date = self.entry_date.get()
+        try:
+            # Parse the date string into a datetime object
+            datetime_obj = datetime.datetime.strptime(date, "%m/%d/%Y")
+        except ValueError:
+            messagebox.showerror("Error", "Invalid date format. Please enter a date in MM/DD/YYYY format.")
+            return
         full_name = self.entry_full_name.get()
         phone_number = self.entry_phone_number.get()
         # Validate phone number
@@ -49,36 +78,75 @@ class UINewPage:
         sex = self.selected_sex.get()
         email = self.entry_email.get()
         occupation = self.entry_occupation.get()
+        vax = self.selected_vax.get()
+        symptoms = ", ".join([symptom for symptom, var in self.selected_symptoms if var.get() == 1])
+        exposure = self.selected_exposure.get()
+        exposure1= self.selected_exposure1.get()
+        test = self.selected_test.get()
+
 
         # If any of the fields are left with no entry, send an error message
-        if not full_name or not phone_number or not address or not age or not sex or not email or not occupation:
-            messagebox.showerror("Error", "Please fill in all the fields.")
+        if not date or not full_name or not phone_number or not address or not age or not sex or not email or not occupation or not vax or not symptoms or not exposure or not exposure1 or not test:
+            messagebox.showerror("Error", "Please fill in all fields.")
             return
         
         # Create a tuple to store the user's information
-        user_data = (full_name.title(), phone_number, address.title(), age, sex.capitalize(), email, occupation.title())
+        user_data = (date, full_name.title(), phone_number, address.title(), age, sex.capitalize(), email, occupation.title(), vax, symptoms, exposure, exposure1, test)
 
-        # Save the data in a file named BEE_INFORMATION
-        with open("BEE_INFORMATION.txt", "a") as file:
+
+        # Save the data in a file
+        with open("BEE_INFORMATION.txt", "a+") as file:
+            file.seek(0)
+            lines = file.readlines()
+            # Get the current number of entries
+            entry_no = len(lines) // 21
+            file.write(f"Entry No.: {entry_no + 1}\n")
+            file.write(f"Date: {user_data[0]}\n")  
+            file.write("\n")
             file.write("User Information:\n")
-            file.write(f"Full Name: {user_data[0]}\n")
-            file.write(f"Phone Number: {user_data[1]}\n")
-            file.write(f"Address: {user_data[2]}\n")
-            file.write(f"Age: {user_data[3]}\n")
-            file.write(f"Gender: {user_data[4]}\n")
-            file.write(f"Email Address: {user_data[5]}\n")
-            file.write(f"Occupation: {user_data[6]}\n")
+            file.write(f"Full Name: {user_data[1]}\n")
+            file.write(f"Phone Number: {user_data[2]}\n")
+            file.write(f"Address: {user_data[3]}\n")
+            file.write(f"Age: {user_data[4]}\n")
+            file.write(f"Sex: {user_data[5]}\n")
+            file.write(f"Email Address: {user_data[6]}\n")
+            file.write(f"Occupation: {user_data[7]}\n")
+            file.write("\n")
+            file.write("Health Information:\n")
+            file.write(f"Vaccine: {user_data[8]}\n")
+            file.write(f"Symptomps: {user_data[9]}\n")
+            file.write(f"Exposure: {user_data[10]}\n")
+            file.write(f"Exposure: {user_data[11]}\n")
+            file.write(f"Test: {user_data[12]}\n")
+            file.write("\n")
+            file.write("==================================================")
             file.write("\n")
 
         messagebox.showinfo("Success", "Data saved successfully.")
 
+    def display_file_contents(self, new_page):
+        bold_font = font.Font(weight="bold")
+        # Read the contents of the file
+        with open("BEE_INFORMATION.txt", "r") as file:
+            contents = file.read()
+        self.result_label = tk.Label(new_page, text="All Entries:", font=bold_font)
+        self.result_label.pack(anchor='w', padx=50)
+        # Create a text widget to display the file contents
+        text_widget = tk.Text(new_page, height=10, width=50)
+        text_widget.pack(pady=10, padx=30)
 
-        # GENERATE A PRINT CHECK TO ENSURE THAT THE DATA WERE PROPERLY RECORDED
-        print(user_data)
-
+        # Insert the file contents without formatting
+        text_widget.insert("1.0", contents)
 
     def create_form(self, new_page):
         bold_font = font.Font(weight="bold")
+        # Ask the date of entry
+        date = tk.Label(new_page, text="Date (MM/DD/YYYY)", font=bold_font)
+        date.pack(anchor='w', padx=50)
+        self.entry_date = tk.Entry(new_page)
+        self.entry_date.pack(anchor='w', padx=50)
+        self.entry_date.config(width=30)
+
         # Create labels and entry fields for each information field
         head1 = tk.Label(new_page, text="PERSONAL INFORMATION", font=bold_font)
         head1.pack(pady=10)
@@ -152,7 +220,8 @@ class UINewPage:
             "Shortness of breath",
             "Difficulty of breathing",
             "Loss of taste",
-            "Loss of smell"
+            "Loss of smell",
+            "None of the above"
         ]
         self.selected_symptoms = []
         for symptom_choice in symptom_choices:
@@ -184,7 +253,7 @@ class UINewPage:
         for test in test_choices:
             checkbox = tk.Checkbutton(new_page, text=test, variable=self.selected_test, onvalue=test, offvalue="")
             checkbox.pack(anchor='w', padx=50)
- 
+
         # Create the save button
-        save_button = tk.Button(new_page, text="Save", command=lambda: self.save_data(new_page))
+        save_button = tk.Button(new_page, text="Save", command=lambda: self.save_data())
         save_button.pack(anchor='w', padx=50, pady=40)
