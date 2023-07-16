@@ -241,7 +241,8 @@ class UINewPage:
             "Shortness of breath",
             "Difficulty of breathing",
             "Loss of taste",
-            "Loss of smell"
+            "Loss of smell",
+            "None of the above"
         ]
         self.selected_symptoms = []
         for symptom_choice in symptom_choices:
