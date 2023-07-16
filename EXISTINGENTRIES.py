@@ -24,6 +24,7 @@ class ExistingEntries:
 
         # Create a frame inside the canvas for the scrollable content
         content_frame = tk.Frame(canvas)
+        content_frame.configure(bg="#950101")
         content_frame.pack(fill="both", expand=True)
 
         # Configure the canvas scrolling

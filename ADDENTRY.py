@@ -23,21 +23,21 @@ class AddEntry:
 
         # Create a frame inside the canvas for the scrollable content
         content_frame = tk.Frame(canvas)
+        content_frame.configure(bg="#950101")
         content_frame.pack(fill="both", expand=True)
 
         # Configure the scrolling
         canvas.configure(yscrollcommand=scrollbar.set)
         canvas.create_window((0, 0), window=content_frame, anchor="nw")
 
-        ui = UINewPage()
-        # Add the initial data needed for contact tracing.
+        # Add your UI elements to the content frame
         ui.create_form(content_frame)
-        # Add a back button
         ui.back_button(content_frame, self.top)
 
-        # Update the window
+        # Update the canvas scrollable area
         content_frame.update_idletasks()
         canvas.configure(scrollregion=canvas.bbox("all"))
+
 
 
 
