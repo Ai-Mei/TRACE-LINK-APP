@@ -34,19 +34,43 @@ class UINewPage:
 
     # Get the search word and display the matching entry
     def searched_word(self, new_page):
-        searched = self.search_entry.get()
+        bold_font = font.Font(weight="bold")
+        searched = self.search_entry.get().lower()  # Convert search word to lowercase
         with open("BEE_INFORMATION.txt", "r") as file:
-            contents = file.read()
-            index = contents.find(searched)
-            if index != -1:
-                self.text_widget.delete("1.0", tk.END)
-                self.text_widget.insert(tk.END, contents)
-                self.text_widget.tag_add("bold", f"1.{index}", f"1.{index + len(searched)}")
-                bold_font = font.Font(self.text_widget, self.text_widget.cget("font"))
-                bold_font.configure(weight="bold")
-                self.text_widget.tag_configure("bold", font=bold_font)
+            lines = file.readlines()  # Read lines into a list
 
-                self.result_label.config(text=f"Result: Word found - {searched}")
+            entry_groups = []
+            current_entry = []
+            for line in lines:
+                if line.startswith("Entry No."):
+                    if current_entry:
+                        entry_groups.append(current_entry)
+                    current_entry = []
+                current_entry.append(line)
+            entry_groups.append(current_entry)  # Add the last entry group
+
+            found_entries = []
+            for entry in entry_groups:
+                if any(searched in line.lower() for line in entry):  # Convert line to lowercase
+                    found_entries.append(entry)
+
+            if found_entries:
+                # Clear the text widget
+                self.text_widget.delete("1.0", tk.END)
+
+                # Insert the selected lines into the text widget
+                for entry in found_entries:
+                    for line in entry:
+                        self.text_widget.insert(tk.END, line)
+
+                    # Apply bold formatting to the search word
+                    for i, line in enumerate(entry):
+                        if searched in line.lower():  # Convert line to lowercase
+                            index = line.lower().find(searched)  # Convert line to lowercase
+                            self.text_widget.tag_add("bold", f"{i + 1}.{index}", f"{i + 1}.{index + len(searched)}")
+                    self.text_widget.tag_configure("bold", font=bold_font)
+
+                self.result_label.config(text=f"Result: Word found - {self.search_entry.get()}")
             else:
                 self.text_widget.delete("1.0", tk.END)
                 self.result_label.config(text="Result: Word not found.")
@@ -129,8 +153,8 @@ class UINewPage:
         # Read the contents of the file
         with open("BEE_INFORMATION.txt", "r") as file:
             contents = file.read()
-        self.result_label = tk.Label(new_page, text="All Entries:", font=bold_font)
-        self.result_label.pack(anchor='w', padx=50)
+        self.label = tk.Label(new_page, text="All Entries:", font=bold_font)
+        self.label.pack(anchor='w', padx=50)
         # Create a text widget to display the file contents
         text_widget = tk.Text(new_page, height=10, width=50)
         text_widget.pack(pady=10, padx=30)
