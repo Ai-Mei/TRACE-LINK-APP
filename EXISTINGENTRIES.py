@@ -13,7 +13,7 @@ class ExistingEntries:
 
         # Create the next page
         new_page = tk.Toplevel(self.top)
-        new_page.geometry("500x500")
+        new_page.geometry("480x500")
         new_page.title("Existing Entries")
 
         # Create a canvas with a scrollbar
