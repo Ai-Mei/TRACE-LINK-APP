@@ -37,7 +37,7 @@ class UINewPage:
     # Get the search word and display the matching entry
     def searched_word(self, new_page):
         bold_font = font.Font(weight="bold")
-        searched = self.search_entry.get().lower()  
+        searched = self.search_entry.get().lower()
         with open("BEE_INFORMATION.txt", "r") as file:
             lines = file.readlines()
 
@@ -53,38 +53,36 @@ class UINewPage:
 
             found_entries = []
             for entry in entry_groups:
-                if any(searched in line.lower() for line in entry):  
+                if any(searched in line.lower() for line in entry):
                     found_entries.append(entry)
 
             if found_entries:
                 # Clear the text widget
                 self.text_widget.delete("1.0", tk.END)
 
-                # Insert the selected lines into the text widget
                 for entry in found_entries:
+                    # Insert the selected lines into the text widget
                     for line in entry:
                         self.text_widget.insert(tk.END, line)
 
                 # Apply bold formatting to the search word
-        for i, entry in enumerate(entry_groups):
-            # Clear the text widget
-            self.text_widget.delete("1.0", tk.END)
+                for i, entry in enumerate(found_entries):
+                    for j, line in enumerate(entry):
+                        start = 0
+                        while True:
+                            index = line.lower().find(searched, start)
+                            if index == -1:
+                                break
+                            self.text_widget.tag_add("bold", f"{(i * len(entry)) + j + 1}.{index}",
+                                                    f"{(i * len(entry)) + j + 1}.{index + len(searched)}")
+                            start = index + len(searched)
 
-            # Insert the selected lines into the text widget
-            for line in entry:
-                self.text_widget.insert(tk.END, line)
+                self.text_widget.tag_configure("bold", font=bold_font)
+            else:
+                self.text_widget.delete("1.0", tk.END)
+                self.result_label.config(text="Result: Word not found.", bg="#950101")
 
-            # Apply bold formatting to the search word
-            for j, line in enumerate(entry):
-                start = 0
-                while True:
-                    index = line.lower().find(searched, start)
-                    if index == -1:
-                        break
-                    self.text_widget.tag_add("bold", f"{j + 1}.{index}", f"{j + 1}.{index + len(searched)}")
-                    start = index + len(searched)
 
-        self.text_widget.tag_configure("bold", font=bold_font)
     # UPDATE THE SAVE DATA TO GET ALL OF THE INFORMATION IN THE HEALTH INFORMATION
     def save_data(self):
         # Get the date
@@ -221,14 +219,11 @@ class UINewPage:
         self.entry_email.pack(anchor='w', padx=50)
         self.entry_email.config(width=60)
 
-
-
         label_occupation = tk.Label(new_page, text="Occupation:", font=font_format, bg="#950101")
         label_occupation.pack(anchor='w', padx=50)
         self.entry_occupation = tk.Entry(new_page)
         self.entry_occupation.pack(anchor='w', padx=50)
         self.entry_occupation.config(width=60)
-
 
         head2 = tk.Label(new_page, text="HEALTH INFORMATION", font=bold_font, bg="#950101")
         head2.pack(pady=10)
